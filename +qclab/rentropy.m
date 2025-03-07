@@ -21,7 +21,7 @@ function S = rentropy(A,B)
 	if isequal(A*B,B*A)
 		% If A and B commute we can diagonalize simultaneously
 		[U,a] = eig(A,'vector');
-		b = diag(U*B*conj(U'));
+		b = diag(U*B*U');
 		% and just compute the Kullback-Leibler divergence
 		S = KL_divergence(a,b);
 		%return
@@ -30,9 +30,9 @@ function S = rentropy(A,B)
 	% Otherwise we gotta diagonalize separately (slowest exit)
 	[U,a] = eig(A,'vector');
 	[V,b] = eig(B,'vector');
-	log_A = conj(U')*diag(log2(a))*U;
-	log_B = conj(V')*diag(log2(b))*V;
-	A = conj(U')*diag(a)*U; % Eigenvector sorting can be a bitch!
+	log_A = U'*diag(log2(a))*U;
+	log_B = V'*diag(log2(b))*V;
+	A = U'*diag(a)*U; % Eigenvector sorting can be a bitch!
 	% And finally get our /_quantum_/ relative entropy
 	S = trace( A * (log_A - log_B) );
 	return

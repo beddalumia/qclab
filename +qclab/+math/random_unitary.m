@@ -10,11 +10,12 @@ function U = random_unitary(N)
 	%  https://arxiv.org/abs/math-ph/0609050 
 
 	z = (randn(N) + 1i*randn(N))/sqrt(2); % Ginibre Ensemble
-	[q,r] = qr(z);   % QR decomposition (algorithm-independent)
-	d = diag(r);     % Extract the diagonal of R
-	p = sign(d);     % Get the signs of D
-	q = q*diag(p)*q; % Select the correct "gauge" for Q
+	[q,r] = qr(z); % QR decomposition (algorithm-independent)
+	d = diag(r);   % Extract the diagonal of R
+	p = sign(d);   % Get the signs of D
+	p(p==0) = 1;   % Numerical guardrail
 
-	U = q; % Haar-measure (uniformly distributed U(N) matrix)
+	% Haar-measure (uniformly distributed U(N) matrix)
+	U = bsxfun(@times,q,p.'); 
 
 end

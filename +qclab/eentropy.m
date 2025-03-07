@@ -25,9 +25,13 @@ function ent = eentropy(rho,varargin)
 % [base,alpha] = opt_args({ 2, 1 },varargin{:});
 if nargin < 2
     base = 2;
+else
+    base = varargin{1};
 end
 if nargin < 3
     alpha = 1;
+else
+    alpha = varargin{2};
 end 
 
 lam = eig(full(rho));
