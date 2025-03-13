@@ -6,8 +6,20 @@ function S = rentropy(A,B)
 	%
 	%  Copyright: Gabriele Bellomia, 2025
 
+	% Sanitize noisy zeros
+	A(abs(A) < 1e-8) = 0; 
+	B(abs(B) < 1e-8) = 0;
+
 	if not(isequal(size(A),size(B)))
 		error("The density matrices must have the same dimension!")
+	end
+
+	if not(qclab.math.is_rdm(A))
+		error("The first argument is not a well defined density matrix")
+	end
+
+	if not(qclab.math.is_rdm(B))
+		error("The second argument is not a well defined density matrix")
 	end
 
 	if and(isdiag(A),isdiag(B))
@@ -15,7 +27,7 @@ function S = rentropy(A,B)
 		% > we just compute the Kullback-Leibler divergence
 		a = diag(A); b = diag(B);
 		S = KL_divergence(a,b);
-		%return
+		return
 	end
 
 	if isequal(A*B,B*A)
@@ -24,17 +36,22 @@ function S = rentropy(A,B)
 		b = diag(U*B*U');
 		% and just compute the Kullback-Leibler divergence
 		S = KL_divergence(a,b);
-		%return
+		return
 	end
 
 	% Otherwise we gotta diagonalize separately (slowest exit)
-	[U,a] = eig(A,'vector');
-	[V,b] = eig(B,'vector');
+	[U,a] = eig(A,'vector'); a = real(a);
+	[V,b] = eig(B,'vector'); b = real(b);
 	log_A = U'*diag(log2(a))*U;
 	log_B = V'*diag(log2(b))*V;
 	A = U'*diag(a)*U; % Eigenvector sorting can be a bitch!
 	% And finally get our /_quantum_/ relative entropy
 	S = trace( A * (log_A - log_B) );
+	% Assertion
+	if S<0
+		warning("Something bad happened: relative entropy is negative!")
+		S = NaN;
+	end
 	return
 
 end

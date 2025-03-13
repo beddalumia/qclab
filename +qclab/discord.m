@@ -56,8 +56,9 @@ function [Q,chi,C] = discord(rho,A,B)
     % Initial guess for the Discord
     Q = qclab.rentropy(rho,chi);
 
-    M = 10; beta = 1;
-    t = 0; converged = false;
+    M = 1000; beta = 1;
+    t = 0; n = 0;
+    converged = false;
     chi_ = zeros(N,N);
 
     converged = false;
@@ -97,17 +98,22 @@ function [Q,chi,C] = discord(rho,A,B)
 	    	if abs(Q_-Q)<1E-7
 	    		converged = true;
 	    	end
-	    	if t > 10^4
+	    	if n > 10^4
 	    		converged = true;
 	    	end
     		Q = Q_;
     		chi = Uaxb'*chi_*Uaxb; % (rotate back to original basis)
     		Ua = Ua_;
     		Ub = Ub_;
+    		n = n + 1;
     	end
     	t = t + 1;
     	beta = beta + 100; % Schedule :|
-
+    	if mod(t,100) == 0
+    		fprintf("Time step #%d\n---------------------\n",t)
+    		fprintf("Annealing temperature: T = %.2E\n",1/beta)
+ 			fprintf("Total acceptance rate: %f%%\n\n", n/t*100)
+    	end
 	end
 
 	% Once we finish, we can compute the classical correlations
@@ -116,6 +122,9 @@ function [Q,chi,C] = discord(rho,A,B)
 	c = qclab.rentropy(chi,kron(A,B));
 	if abs(C-c)>1E-12
 		warning("The closest pseudo-classical state might be pathological.");
+		fprintf("χ* = \n\n")
+		disp(chi)
+		qclab.math.is_rdm(chi);
 	end
 
 	% Final sanity check and return

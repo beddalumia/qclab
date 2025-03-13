@@ -34,6 +34,11 @@ else
     alpha = varargin{2};
 end 
 
+% Input assertion
+if not(qclab.math.is_rdm(rho))
+    error("The input variable is not a well defined density matrix")
+end
+
 lam = eig(full(rho));
 lam = lam(lam>0); % handle zero entries better: we want 0*log(0) = 0, not NaN
 

@@ -62,3 +62,8 @@ end
 
 rho = gin*gin';
 rho = rho/trace(rho);
+
+% Final assertion
+if not(qclab.math.is_rdm(rho))
+    error("Critical failure: the generated matrix is not a valid density matrix!")
+end

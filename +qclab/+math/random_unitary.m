@@ -18,4 +18,9 @@ function U = random_unitary(N)
 	% Haar-measure (uniformly distributed U(N) matrix)
 	U = bsxfun(@times,q,p.'); 
 
+	% Final assertion
+	if any(any(abs(inv(U)-U')>1E-12))
+		error("Critical failure: the generated matrix is not unitary!")
+	end
+
 end
