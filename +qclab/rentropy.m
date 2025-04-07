@@ -40,13 +40,14 @@ function S = rentropy(A,B)
 	end
 
 	% Otherwise we gotta diagonalize separately (slowest exit)
-	[U,a] = eig(A,'vector'); a = real(a);
-	[V,b] = eig(B,'vector'); b = real(b);
-	log_A = U'*diag(log2(a))*U;
-	log_B = V'*diag(log2(b))*V;
-	A = U'*diag(a)*U; % Eigenvector sorting can be a bitch!
+	%[U,a] = eig(A,'vector'); a = real(a);
+	%[V,b] = eig(B,'vector'); b = real(b);
+	%log_A = U'*diag(log2(a))*U;
+	%log_B = V'*diag(log2(b))*V;
+	%A_ = U'*diag(a)*U; % Eigenvector sorting can be a bitch!
 	% And finally get our /_quantum_/ relative entropy
-	S = trace( A * (log_A - log_B) );
+	%S = trace( A_ * (log_A - log_B) );
+    S = trace(A*(logm(A)-logm(B)))/log(2);
 	% Assertion
 	if S<0
 		warning("Something bad happened: relative entropy is negative!")
