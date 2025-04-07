@@ -35,7 +35,7 @@ function [Q,chi,C] = discord(rho,A,B)
 	end
 
 	Nr = sqrt(N); % Reduced System Dimension
-	Nc = 50; % Number of candidates
+	Nc = 1000; % Number of candidates
 
 	taboos = {};
 	q_best = NaN;
@@ -45,58 +45,63 @@ function [Q,chi,C] = discord(rho,A,B)
 
 		% Initializations
 		chi = zeros(N,N);
-		M = 100*instance; beta = 1;
+		M = 1000+instance; beta = 1;
 
 		% Initial guess for the local unitaries
-        % Always try the identity (other Haar starting points apparently
-        %                          suck... to be investigated why)
-        Ua = eye(Nr);  
-        Ub = eye(Nr);
+        if instance==1
 
-		% Initial guess for the chi
-		for i = 0:Nr-1
-			for j = 0:Nr-1
-				ixj = 1 + i + j*Nr;
-				chi(ixj,ixj) = rho(ixj,ixj);
-			end
-        end
-
-		try 
-			qclab.math.is_rdm(chi);
-		catch
-			error("The initial guess for the closest pseudo-classical state is not a valid density matrix")
-		end
-
-		% Initial guess for the Discord
-		Q = qclab.rentropy(rho,chi);
+            % Always try the identity (other Haar starting points apparently
+            %                          suck... to be investigated why)
+            Ua = eye(Nr);  
+            Ub = eye(Nr);
+    
+		    % Initial guess for the chi
+		    for i = 0:Nr-1
+			    for j = 0:Nr-1
+				    ixj = 1 + i + j*Nr;
+				    chi(ixj,ixj) = rho(ixj,ixj);
+			    end
+            end
+    
+		    try 
+			    qclab.math.is_rdm(chi);
+		    catch
+			    error("The initial guess for the closest pseudo-classical state is not a valid density matrix")
+		    end
+    
+		    % Initial guess for the Discord
+		    Q = qclab.rentropy(rho,chi);
         
+        else
 
-		% % In general try a random Haar-measure unitary
-		% Ua = qclab.math.random_unitary(Nr);
-		% Ub = qclab.math.random_unitary(Nr);
-        % %
-		% % Map the density matrix to the new basis
-		% Uaxb = kron(Ua,Ub);
-		% rho_ = Uaxb*rho*Uaxb';
-        % %
-		% % Update guess for chi in the new basis
-		% for i = 0:Nr-1
-		%  	for j = 0:Nr-1
-		%  		ixj = 1 + i + j*Nr;
-		%  		chi(ixj,ixj) = rho_(ixj,ixj);
-		%  	end
-		% end
-		% try 
-		% 	qclab.math.is_rdm(chi);
-		% catch
-		%  	error("The updated candidate closest pseudo-classical state is not a valid density matrix")
-		% end
-        % % 
-		% % % Initial guess for the Discord
-		% Q = qclab.rentropy(rho_,chi);
-        % % 
-		% % % Rotate back to the computational basis
-		% chi = Uaxb'*chi*Uaxb;
+		    % In general try a random Haar-measure unitary
+		    Ua = qclab.math.random_unitary(Nr);
+		    Ub = qclab.math.random_unitary(Nr);
+            %
+		    % Map the density matrix to the new basis
+		    Uaxb = kron(Ua,Ub);
+		    rho_ = Uaxb*rho*Uaxb';
+            %
+		    % Update guess for chi in the new basis
+		    for i = 0:Nr-1
+		 	    for j = 0:Nr-1
+		 		    ixj = 1 + i + j*Nr;
+		 		    chi_(ixj,ixj) = rho_(ixj,ixj);
+		 	    end
+		    end
+		    try 
+			    qclab.math.is_rdm(chi_);
+		    catch
+		 	    error("The updated candidate closest pseudo-classical state is not a valid density matrix")
+		    end
+            % 
+		    % % Initial guess for the Discord
+		    Q = qclab.rentropy(rho_,chi_);
+            % 
+		    % % Rotate back to the computational basis
+		    chi = Uaxb'*chi_*Uaxb;
+
+        end
 
 		converged = false;
 		t = 0; n = 0;
