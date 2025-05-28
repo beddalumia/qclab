@@ -209,7 +209,8 @@ function [Q,chi,C] = discord(rho,A,B)
 		fprintf("χ* = \n\n")
 		disp(chi_best)
 		qclab.math.is_rdm(chi_best);
-	end
+    end
+    chi = chi_best;
 
 	% Final sanity check and return
     Q = q_best;
