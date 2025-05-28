@@ -15,11 +15,11 @@ function S = rentropy(A,B)
 	end
 
 	if not(qclab.math.is_rdm(A))
-		error("The first argument is not a well defined density matrix")
+		warning("The first argument is not a well defined density matrix")
 	end
 
 	if not(qclab.math.is_rdm(B))
-		error("The second argument is not a well defined density matrix")
+		warning("The second argument is not a well defined density matrix")
 	end
 
 	if and(isdiag(A),isdiag(B))
@@ -27,6 +27,7 @@ function S = rentropy(A,B)
 		% > we just compute the Kullback-Leibler divergence
 		a = diag(A); b = diag(B);
 		S = KL_divergence(a,b);
+        warning("QRE computed as a KL divergence as A and B are diagonal")
 		return
 	end
 
@@ -36,6 +37,7 @@ function S = rentropy(A,B)
 		b = diag(U*B*U');
 		% and just compute the Kullback-Leibler divergence
 		S = KL_divergence(a,b);
+        warning("QRE computed as a KL divergence as A and B commute")
 		return
 	end
 

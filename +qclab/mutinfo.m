@@ -16,13 +16,13 @@ function I = mutinfo(rho,rho_A,rho_B)
 	%       the function to perform the traces itself, of course.
 
 	if not(qclab.math.is_rdm(rho))
-		error("The first argument is not a well defined density matrix")
+		warning("The first argument is not a well defined density matrix")
 	end
 	if not(qclab.math.is_rdm(rho_A))
-		error("The second argument is not a well defined density matrix")
+		warning("The second argument is not a well defined density matrix")
 	end
 	if not(qclab.math.is_rdm(rho_B))
-		error("The third argument is not a well defined density matrix")
+		warning("The third argument is not a well defined density matrix")
 	end
 
 	S = qclab.eentropy(rho);

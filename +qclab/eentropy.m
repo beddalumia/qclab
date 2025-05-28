@@ -36,7 +36,7 @@ end
 
 % Input assertion
 if not(qclab.math.is_rdm(rho))
-    error("The input variable is not a well defined density matrix")
+    warning("The input variable is not a well defined density matrix")
 end
 
 lam = eig(full(rho));
